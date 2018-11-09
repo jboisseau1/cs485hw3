@@ -11,21 +11,21 @@ struct Vertex
 	    TYPE_INIT = 1,
 	    TYPE_GOAL = 2
 	};
-	
+
     int    m_parent;
     double m_state[Simulator::STATE_NR_DIMS];
     int    m_type;
     int    m_nchildren;
-    
+
 };
 
-    
+
 
 class MotionPlanner
 {
 public:
     MotionPlanner(Simulator * const simulator);
-            
+
     ~MotionPlanner(void);
 
     void ExtendRandom(void);
@@ -35,8 +35,8 @@ public:
     void ExtendEST(void);
 
     void ExtendMyApproach(void);
-    
-        
+
+
 protected:
     bool IsProblemSolved(void)
     {
@@ -49,14 +49,15 @@ protected:
 
     void ExtendTree(const int    vid,
 		    const double sto[]);
-    
+    bool reachedDest(const double currentPos[],const double dest[]);
+
     Simulator            *m_simulator;
     std::vector<Vertex *> m_vertices;
     int                   m_vidAtGoal;
     double                m_totalSolveTime;
 
-    
-    friend class Graphics;    
+
+    friend class Graphics;
 };
 
 #endif
