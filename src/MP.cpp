@@ -74,12 +74,22 @@ void MotionPlanner::ExtendRandom(void)
     StartTime(&clk);
 
 //your code
+  double sto[2];
+  m_simulator->SampleState(sto); 
+   srand (time(NULL));
+   int vid = rand() % m_vertices.size() + 1;
+   ExtendTree(vid,sto);
+
+   if(m_simulator->HasRobotReachedGoal()){
+     printf("FINISHED IN: %lf\n", m_totalSolveTime);
+   }
+   else m_totalSolveTime += ElapsedTime(&clk);
 	//sto is chosen based on some probbability from the goal region using samplestate
 	//vid is chosen randomly from the size of the m_vertices list (its the index)
 	//run the ExtendTree function with the new STO and Vertices
 	//check if youre within the goal region ti end it and print the solved time
 
-    m_totalSolveTime += ElapsedTime(&clk);
+
 }
 
 void MotionPlanner::ExtendRRT(void)

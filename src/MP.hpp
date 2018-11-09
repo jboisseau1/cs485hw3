@@ -2,7 +2,7 @@
 #define MOTION_PLANNER_HPP_
 
 #include "Simulator.hpp"
-
+#include <stdlib.h>
 struct Vertex
 {
     enum
