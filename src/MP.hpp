@@ -36,6 +36,7 @@ public:
 
     void ExtendMyApproach(void);
 
+	double distFromGoal(int, const double[]);
 
 protected:
     bool IsProblemSolved(void)

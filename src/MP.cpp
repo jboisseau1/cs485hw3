@@ -94,18 +94,35 @@ void MotionPlanner::ExtendRandom(void)
 
 void MotionPlanner::ExtendRRT(void)
 {
-    Clock clk;
-    StartTime(&clk);
+	Clock clk;
+	StartTime(&clk);
 
-//your code
-	//sto is chosen the same way as above
+	//your code
+		//sto is chosen the same way as above
+	double sto[2];
+	m_simulator->SampleState(sto);
 	//vid is chosen based on the closest vertex  so we'll have to run through the vertices and find the distance
+	int vid = 0;
+	int i;
+	for (i = 1; i < m_vertices.size(); i++) {
+		if (distFromGoal(i - 1, sto) > distFromGoal(i, sto)) {
+			vid = i;
+		}
+	}
+	ExtendTree(vid, sto);
+
+	if (m_simulator->HasRobotReachedGoal()) {
+		printf("FINISHED IN: %lf\n", m_totalSolveTime);
+	}
+
 	//and keep track of the largest one as we go. potential to optimize by using a good sort but meh
 	//check done as above
+	else {
+		m_totalSolveTime += ElapsedTime(&clk);
 
-    m_totalSolveTime += ElapsedTime(&clk);
+	}
+
 }
-
 
 void MotionPlanner::ExtendEST(void)
 {
@@ -132,7 +149,43 @@ void MotionPlanner::ExtendMyApproach(void)
 	//vid chosen from the sorting the vertex list by how close it is (we should build a helper function) and taking the
 	//5 (or some other number) closest ones and choseing one of those randomly (or we can do it based on how many children it has)
     //check done as above
-	m_totalSolveTime += ElapsedTime(&clk);
+	double sto[2];
+	m_simulator->SampleState(sto);
+	int sorted[m_vertices.size()];
+	int i,j;
+	for (i = 0; i < m_vertices.size(); i++) {
+		sorted[i] = i;
+	}
+	//i need a better sort................. currently does bubble didnt want to have to implement mergesort
+	for (i = 0; i < m_vertices.size(); i++) {
+		for (j = 0; j < m_vertices.size(); j++) {
+			//sort in some way based on distance from goal.
+			if (distFromGoal(sorted[j], sto) > distFromGoal(sorted[j+1], sto)) {
+				int temp = sorted[j];
+				sorted[j] = sorted[j + 1];
+				sorted[j + 1] = temp;
+			}
+		}
+	}
+	if (m_vertices.size() < 4) {
+		//choose random number between 0 and size od m_vertices
+		int vid = rand() % m_vertices.size();
+	}
+	else {
+		//choose random number between 0 and 3 ;;;;;;;;;;;;;;;;maybe put sort in here.
+		int vid = sorted[rand() % 4];
+	}
+	ExtendTree(vid, sto);
+	if (m_simulator->HasRobotReachedGoal()) {
+		printf("FINISHED IN: %lf\n", m_totalSolveTime);
+	}
+
+	//check done as above
+	else {
+		m_totalSolveTime += ElapsedTime(&clk);
+
+	}
+
 }
 
 bool MotionPlanner::reachedDest(const double currentPos[],const double dest[]){
@@ -145,6 +198,7 @@ bool MotionPlanner::reachedDest(const double currentPos[],const double dest[]){
   return ((currentX>destX-threshold&&currentX<destX+threshold) &&
           (currentY>destY-threshold&&currentY<destY+threshold));
 }
+
 void MotionPlanner::AddVertex(Vertex * const v)
 {
     if(v->m_type == Vertex::TYPE_GOAL)
@@ -152,6 +206,14 @@ void MotionPlanner::AddVertex(Vertex * const v)
     m_vertices.push_back(v);
     if(v->m_parent >= 0)
 	(++m_vertices[v->m_parent]->m_nchildren);
+}
+
+double MotionPlanner::distFromGoal(int vid, double sto[]) 
+{
+	double x = sto[0] - m_vertices[vid].m_state[0];
+	double y = sto[1] - m_vertices[vid].m_state[1];
+	return sqrt(x*x + y*y);
+	
 }
 
 void MotionPlanner::GetPathFromInitToGoal(std::vector<int> *path) const
