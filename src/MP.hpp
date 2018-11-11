@@ -36,9 +36,16 @@ public:
 
     void ExtendMyApproach(void);
 
-	double distFromGoal(int, const double[]);
+	double distFromGoal(int, double[]);
 
 protected:
+
+    //here
+    int decideVid();
+    double calc(int vert){
+        return 1.0 / (1.0 * pow( (double)m_vertices[vert]->m_nchildren, 2));
+    }
+
     bool IsProblemSolved(void)
     {
 	return m_vidAtGoal >= 0;
