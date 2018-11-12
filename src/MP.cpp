@@ -62,6 +62,8 @@ void MotionPlanner::ExtendTree(const int    vid,
 			  newVertex->m_nchildren = 0;
 			  newVertex->m_state[0] = testState[0] - (testVector[0] * smallMovement);
 			  newVertex->m_state[1] = testState[1] - (testVector[1] * smallMovement);
+
+			  m_vertices[vid]->m_nchildren++;
 		  }
 		  break;
 
