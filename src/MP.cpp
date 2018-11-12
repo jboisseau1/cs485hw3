@@ -22,8 +22,6 @@ MotionPlanner::MotionPlanner(Simulator * const simulator)
 MotionPlanner::~MotionPlanner(void)
 {
     //do not delete m_simulator
-
-
     const int n = m_vertices.size();
     for(int i = 0; i < n; ++i)
 	delete m_vertices[i];
@@ -36,24 +34,50 @@ void MotionPlanner::ExtendTree(const int    vid,
   double smallMovement = m_simulator->GetDistOneStep()/10;
 
   // TODO: x and y should be vertex points
-  double X = m_simulator->GetRobotCenterX();
-  double Y = m_simulator->GetRobotCenterY();
+  double X = m_vertices[vid].m_state[0];
+  double Y = m_vertices[vid].m_state[1];
   bool hitObstacle = false;
-
+  double X_to_sto = sto[0] - X;
+  double Y_to_sto = sto[1] - Y;
+  double mag = distFromGoal(vid, sto);
+  double testVector[2] = { X_to_sto / mag, Y_to_sto / mag };
   double testState[2] = {X,Y};
+
+  m_simulator->SetRobotState(testState);
+  int counter = 0;
   while (!hitObstacle) {
     if(!reachedDest(testState,sto)){
       //moves along the line in small steps
-      testState[0]+=smallMovement;
-      testState[1]+=smallMovement;
+      testState[0]+=(testVector[0]*smallMovement);
+      testState[1]+=(testVector[1]*smallMovement);
+	  counter++;
+
       //sets rotbot state to test
       m_simulator->SetRobotState(testState);
-      if(m_simulator->IsValidState()){
-        //add up to this point of the line
-      }
-      else hitObstacle = true;
+
+	  if(!m_simulator->IsValidState()){
+		  if (counter != 1) {
+			  Vertex *newVertex = new Vertex();
+			  newVertex->m_parent = vid;
+			  newVertex->m_nchildren = 0;
+			  newVertex->m_state[0] = testState[0] - (testVector[0] * smallMovement);
+			  newVertex->m_state[1] = testState[1] - (testVector[1] * smallMovement);
+		  }
+		  break;
+
+	  }//is not valid state
     }
-    else break; //reached the point without hitting an Obstacle
+	else { 
+		Vertex *newVertex = new Vertex();
+		newVertex->m_parent = vid;
+		newVertex->m_nchildren = 0;
+		newVertex->m_state[0] = testState[0];
+		newVertex->m_state[1] = testState[1];
+
+		m_vertices[vid]->m_nchildren++;
+
+		break; 
+	}//reached the point without hitting an Obstacle
 
 
   }
