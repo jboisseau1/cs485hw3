@@ -34,8 +34,8 @@ void MotionPlanner::ExtendTree(const int    vid,
   double smallMovement = m_simulator->GetDistOneStep()/10;
 
   // TODO: x and y should be vertex points
-  double X = m_vertices[vid].m_state[0];
-  double Y = m_vertices[vid].m_state[1];
+  double X = m_vertices[vid] -> m_state[0];
+  double Y = m_vertices[vid] -> m_state[1];
   bool hitObstacle = false;
   double X_to_sto = sto[0] - X;
   double Y_to_sto = sto[1] - Y;
@@ -63,22 +63,22 @@ void MotionPlanner::ExtendTree(const int    vid,
 			  newVertex->m_state[0] = testState[0] - (testVector[0] * smallMovement);
 			  newVertex->m_state[1] = testState[1] - (testVector[1] * smallMovement);
 
-			  m_vertices[vid]->m_nchildren++;
+        AddVertex(newVertex);
 		  }
 		  break;
 
 	  }//is not valid state
     }
-	else { 
+	else {
 		Vertex *newVertex = new Vertex();
 		newVertex->m_parent = vid;
 		newVertex->m_nchildren = 0;
 		newVertex->m_state[0] = testState[0];
 		newVertex->m_state[1] = testState[1];
+    AddVertex(newVertex);
 
-		m_vertices[vid]->m_nchildren++;
 
-		break; 
+		break;
 	}//reached the point without hitting an Obstacle
 
 
@@ -101,7 +101,7 @@ void MotionPlanner::ExtendRandom(void)
 
 //your code
   double sto[2];
-  m_simulator->SampleState(sto); 
+  m_simulator->SampleState(sto);
    srand (time(NULL));
    int vid = rand() % m_vertices.size() + 1;
    ExtendTree(vid,sto);
@@ -177,19 +177,19 @@ int MotionPlanner::decideVid()
 {
   //Calculate the weight with the vertices
   double weight = 0;
-  printf("%d\n", m_vertices.size());
+  printf("%lu\n", m_vertices.size());
   for (int cntr = 0; cntr < m_vertices.size(); cntr++){
     //add up the weight
     weight += calc(cntr);
   }
 
   // decide vertex from weight
-  double finalWeight = PseudoRandomUniformReal(0,weight); 
+  double finalWeight = PseudoRandomUniformReal(0,weight);
 
   //find vid with vertices
   int finalVid = 0;
   weight = 0;
-  for (int cntr2 = 0; cntr2 < m_vertices.size(); cntr2++){ 
+  for (int cntr2 = 0; cntr2 < m_vertices.size(); cntr2++){
     weight += calc(cntr2);
     if (weight >= finalWeight){
       finalVid = cntr2;
@@ -270,12 +270,12 @@ void MotionPlanner::AddVertex(Vertex * const v)
 	(++m_vertices[v->m_parent]->m_nchildren);
 }
 
-double MotionPlanner::distFromGoal(int vid, double sto[]) 
+double MotionPlanner::distFromGoal(int vid, const double sto[])
 {
 	double x = sto[0] - m_vertices[vid]->m_state[0];
 	double y = sto[1] - m_vertices[vid]->m_state[1];
 	return sqrt(x*x + y*y);
-	
+
 }
 
 void MotionPlanner::GetPathFromInitToGoal(std::vector<int> *path) const

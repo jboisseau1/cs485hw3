@@ -36,7 +36,7 @@ public:
 
     void ExtendMyApproach(void);
 
-	double distFromGoal(int, double[]);
+	double distFromGoal(int, const double[]);
 
 protected:
 
