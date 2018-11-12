@@ -220,7 +220,7 @@ void MotionPlanner::ExtendMyApproach(void)
 	}
 	//i need a better sort................. currently does bubble didnt want to have to implement mergesort
 	for (i = 0; i < m_vertices.size(); i++) {
-		for (j = 0; j < m_vertices.size(); j++) {
+		for (j = 0; j < m_vertices.size()-1; j++) {
 			//sort in some way based on distance from goal.
 			if (distFromGoal(sorted[j], sto) > distFromGoal(sorted[j+1], sto)) {
 				int temp = sorted[j];
