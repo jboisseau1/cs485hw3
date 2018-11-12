@@ -148,20 +148,55 @@ void MotionPlanner::ExtendRRT(void)
 
 }
 
+/** your code
+sto is chosen as above
+vid chosen based on with probability proportional to how many children are coming out of it.
+we know how much each vertex has (m_nchildren) but im unsure how to make it chose based on that since its a probability distribution
+so someone else is gonna have think of something
+check done as above
+*/
 void MotionPlanner::ExtendEST(void)
 {
     Clock clk;
     StartTime(&clk);
 
-//your code
-	//sto is chosen as above
-	//vid chosen based on with probability proportional to how many children are coming out of it.
-	//we know how much each vertex has (m_nchildren) but im unsure how to make it chose based on that since its a probability distribution
-	//so someone else is gonna have think of something
-	//check done as above
+  // Get our next state to check
+  double sto[2];
+  m_simulator->SampleState(sto);
+
+  int vid = decideVid();
+  ExtendTree(vid, sto);
+
     m_totalSolveTime += ElapsedTime(&clk);
 }
 
+//here
+int MotionPlanner::decideVid()
+{
+  //Calculate the weight with the vertices
+  double weight = 0;
+  printf("%d\n", m_vertices.size());
+  for (int cntr = 0; cntr < m_vertices.size(); cntr++){
+    //add up the weight
+    weight += calc(cntr);
+  }
+
+  // decide vertex from weight
+  double finalWeight = PseudoRandomUniformReal(0,weight); 
+
+  //find vid with vertices
+  int finalVid = 0;
+  weight = 0;
+  for (int cntr2 = 0; cntr2 < m_vertices.size(); cntr2++){ 
+    weight += calc(cntr2);
+    if (weight >= finalWeight){
+      finalVid = cntr2;
+      break;
+    }
+  }
+
+  return finalVid;
+}
 
 void MotionPlanner::ExtendMyApproach(void)
 {
@@ -177,6 +212,7 @@ void MotionPlanner::ExtendMyApproach(void)
 	m_simulator->SampleState(sto);
 	int sorted[m_vertices.size()];
 	int i,j;
+  int vid = 0;
 	for (i = 0; i < m_vertices.size(); i++) {
 		sorted[i] = i;
 	}
@@ -193,11 +229,11 @@ void MotionPlanner::ExtendMyApproach(void)
 	}
 	if (m_vertices.size() < 4) {
 		//choose random number between 0 and size od m_vertices
-		int vid = rand() % m_vertices.size();
+		vid = rand() % m_vertices.size();
 	}
 	else {
 		//choose random number between 0 and 3 ;;;;;;;;;;;;;;;;maybe put sort in here.
-		int vid = sorted[rand() % 4];
+		vid = sorted[rand() % 4];
 	}
 	ExtendTree(vid, sto);
 	if (m_simulator->HasRobotReachedGoal()) {
@@ -234,8 +270,8 @@ void MotionPlanner::AddVertex(Vertex * const v)
 
 double MotionPlanner::distFromGoal(int vid, double sto[]) 
 {
-	double x = sto[0] - m_vertices[vid].m_state[0];
-	double y = sto[1] - m_vertices[vid].m_state[1];
+	double x = sto[0] - m_vertices[vid]->m_state[0];
+	double y = sto[1] - m_vertices[vid]->m_state[1];
 	return sqrt(x*x + y*y);
 	
 }
