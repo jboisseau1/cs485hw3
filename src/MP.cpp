@@ -183,9 +183,7 @@ void MotionPlanner::ExtendMyApproach(void)
         StartTime(&clk);
 
         //sto chosen as above
-        //vid chosen from the sorting the vertex list by how close it is (we should build a helper function) and taking the
-        //5 (or some other number) closest ones and choseing one of those randomly (or we can do it based on how many children it has)
-        //check done as above
+        //vid chosen from the sorting the vertex list by how close it is
         double sto[2];
         m_simulator->SampleState(sto);
         int sorted[m_vertices.size()];
