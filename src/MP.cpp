@@ -109,17 +109,17 @@ void MotionPlanner::ExtendRandom(void)
 
    if(m_simulator->HasRobotReachedGoal()){
      printf("FINISHED IN: %lf\n", m_totalSolveTime);
-     std::vector<int> vidsToGoal;
-     printf("test0\n");
-     GetPathFromInitToGoal(&vidsToGoal);
-       while (true) {
-         int i;
-         for (i = 0; i < vidsToGoal.size(); i++) {
-           m_simulator->SetRobotState(m_vertices[i]->m_state);
-           printf("in for\n" );
-           getchar();
-         }
-       }
+     // std::vector<int> vidsToGoal;
+     // printf("test0\n");
+     // GetPathFromInitToGoal(&vidsToGoal);
+     //   while (true) {
+     //     int i;
+     //     for (i = 0; i < vidsToGoal.size(); i++) {
+     //       m_simulator->SetRobotState(m_vertices[i]->m_state);
+     //       printf("in for\n" );
+     //       getchar();
+     //     }
+     //   }
    }
    else m_totalSolveTime += ElapsedTime(&clk);
 	//sto is chosen based on some probbability from the goal region using samplestate
