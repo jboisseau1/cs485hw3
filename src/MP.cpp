@@ -103,7 +103,7 @@ void MotionPlanner::ExtendRandom(void)
   double sto[2];
   m_simulator->SampleState(sto);
    srand (time(NULL));
-   int vid = rand() % m_vertices.size() + 1;
+   int vid = rand() % m_vertices.size();
    ExtendTree(vid,sto);
 
    if(m_simulator->HasRobotReachedGoal()){
