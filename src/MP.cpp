@@ -2,6 +2,7 @@
 #include "PseudoRandom.hpp"
 #include "MyTimer.hpp"
 #include <cstring>
+#include <iostream>
 
 MotionPlanner::MotionPlanner(Simulator * const simulator)
 {
@@ -31,7 +32,7 @@ MotionPlanner::~MotionPlanner(void)
 void MotionPlanner::ExtendTree(const int    vid,
 			       const double sto[])
 {
-  double smallMovement = m_simulator->GetDistOneStep()/10;
+  double smallMovement = m_simulator->GetDistOneStep()/100;
 
   // TODO: x and y should be vertex points
   double X = m_vertices[vid] -> m_state[0];
@@ -46,7 +47,7 @@ void MotionPlanner::ExtendTree(const int    vid,
   m_simulator->SetRobotState(testState);
   int counter = 0;
   while (!hitObstacle) {
-    if(!reachedDest(testState,sto)){
+    if(!reachedDest(testState,sto) && !m_simulator->HasRobotReachedGoal()){
       //moves along the line in small steps
       testState[0]+=(testVector[0]*smallMovement);
       testState[1]+=(testVector[1]*smallMovement);
@@ -68,22 +69,22 @@ void MotionPlanner::ExtendTree(const int    vid,
 		  break;
 
 	  }//is not valid state
-    }
+  }
 	else {
 		Vertex *newVertex = new Vertex();
+    if(m_simulator->HasRobotReachedGoal()){
+      newVertex->m_type = Vertex::TYPE_GOAL;
+    }
 		newVertex->m_parent = vid;
 		newVertex->m_nchildren = 0;
 		newVertex->m_state[0] = testState[0];
 		newVertex->m_state[1] = testState[1];
     AddVertex(newVertex);
-
-
 		break;
 	}//reached the point without hitting an Obstacle
 
 
   }
-
 
 //your code
 	//make a small part (size of step) of the line from the vertex from m_vertices[vid] to the point sto
@@ -108,6 +109,17 @@ void MotionPlanner::ExtendRandom(void)
 
    if(m_simulator->HasRobotReachedGoal()){
      printf("FINISHED IN: %lf\n", m_totalSolveTime);
+     std::vector<int> vidsToGoal;
+     printf("test0\n");
+     GetPathFromInitToGoal(&vidsToGoal);
+       while (true) {
+         int i;
+         for (i = 0; i < vidsToGoal.size(); i++) {
+           m_simulator->SetRobotState(m_vertices[i]->m_state);
+           printf("in for\n" );
+           getchar();
+         }
+       }
    }
    else m_totalSolveTime += ElapsedTime(&clk);
 	//sto is chosen based on some probbability from the goal region using samplestate
@@ -240,6 +252,7 @@ void MotionPlanner::ExtendMyApproach(void)
 	ExtendTree(vid, sto);
 	if (m_simulator->HasRobotReachedGoal()) {
 		printf("FINISHED IN: %lf\n", m_totalSolveTime);
+
 	}
 
 	//check done as above
@@ -287,12 +300,13 @@ void MotionPlanner::GetPathFromInitToGoal(std::vector<int> *path) const
     int i = m_vidAtGoal;
     do
     {
-	rpath.push_back(i);
-	i = m_vertices[i]->m_parent;
+      rpath.push_back(i);
+	    i = m_vertices[i]->m_parent;
     }
     while(i >= 0);
 
     path->clear();
     for(int i = rpath.size() - 1; i >= 0; --i)
-	path->push_back(rpath[i]);
+    path->push_back(rpath[i]);
+
 }
