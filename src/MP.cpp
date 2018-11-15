@@ -181,34 +181,14 @@ void MotionPlanner::ExtendMyApproach(void)
 {
         Clock clk;
         StartTime(&clk);
-
-        //sto chosen as above
-        //vid chosen from the sorting the vertex list by how close it is
         double sto[2];
         m_simulator->SampleState(sto);
-        //int sorted[m_vertices.size()];
-        //int i,j;
         int vid = 0;
-        //for (i = 0; i < m_vertices.size(); i++) {
-        //        sorted[i] = i;
-        //}
-        //bubble sort for closest distance
-        //for (i = 0; i < m_vertices.size(); i++) {
-        //        for (j = 0; j < m_vertices.size()-1; j++) {
-        //                if (distFromGoal(sorted[j], sto) > distFromGoal(sorted[j+1], sto)) {
-        //                        int temp = sorted[j];
-        //                        sorted[j] = sorted[j + 1];
-        //                        sorted[j + 1] = temp;
-        //               }
-        //        }
-        //}
-
         //choose random number between 0 and size od m_vertices
         if (m_vertices.size() < 5) vid = rand() % m_vertices.size();
         //choose random number between 0 and 3
         else vid = rand() % 5 + (m_vertices.size() - 5);
-
-        ExtendTree(vid, sto); //extends from best vid based on distance to sto
+        ExtendTree(vid, sto);
 
         m_totalSolveTime += ElapsedTime(&clk);
 
