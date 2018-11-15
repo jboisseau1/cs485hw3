@@ -188,7 +188,7 @@ void MotionPlanner::ExtendMyApproach(void)
         m_simulator->SampleState(sto);
         //int sorted[m_vertices.size()];
         //int i,j;
-        //int vid = 0;
+        int vid = 0;
         //for (i = 0; i < m_vertices.size(); i++) {
         //        sorted[i] = i;
         //}
@@ -206,7 +206,7 @@ void MotionPlanner::ExtendMyApproach(void)
         //choose random number between 0 and size od m_vertices
         if (m_vertices.size() < 5) vid = rand() % m_vertices.size();
         //choose random number between 0 and 3
-		else vid = rand() % 5 + (m_vertices.size() - 5);
+        else vid = rand() % 5 + (m_vertices.size() - 5);
 
         ExtendTree(vid, sto); //extends from best vid based on distance to sto
 
